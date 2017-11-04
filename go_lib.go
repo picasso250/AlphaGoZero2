@@ -1,3 +1,5 @@
+// 基本类库
+
 package main
 
 import (
