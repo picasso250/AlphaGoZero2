@@ -34,7 +34,7 @@ func main() {
 	}
 	print_go_board()
 
-	qz_neibour := [...]*qizi{nil, nil, nil, nil}
-	qz := qizi{2, 9, 10, qz_neibour}
+	qz_neibour := [...]*QiZi{nil, nil, nil, nil}
+	qz := QiZi{2, 9, 10, qz_neibour}
 	go_die_qi_print_iter(&qz, 0)
 }
