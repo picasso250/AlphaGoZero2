@@ -29,6 +29,7 @@ func assert(cond bool) {
 }
 
 // 在某处位置走一步棋(计算机版本)
+// 有可能是在禁着点上，在人类版本上考虑此点
 func one_move_(i int, j int, color go_color) (err error) {
 	assert(i >= 0 && i < BOARD_SIZE)
 	assert(j >= 0 && j < BOARD_SIZE)

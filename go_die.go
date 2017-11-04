@@ -11,10 +11,12 @@ import (
 
 // 棋子的气
 // 棋子和他的四个邻居们
+// 是 4-Tree
 type QiZi struct {
-	color go_color
-	i     int
-	j     int
+	color  go_color
+	i      int
+	j      int
+	parent *Qizi
 	// 0 1 2 3
 	//   0
 	// 1 o 2
@@ -29,8 +31,7 @@ func go_die_qi_print_tab(tab int) {
 func go_die_qi_print_iter(qz *QiZi, tab int) {
 	if qz != nil {
 		fmt.Printf("(%d,%d) %c\n",
-			qz.i, qz.j,
-			go_color_repr_map[qz.color])
+			qz.i, qz.j, go_color_repr_map[qz.color])
 		for i := 0; i < 4; i++ {
 			go_die_qi_print_tab(tab + 1)
 			fmt.Printf("| ")
@@ -47,8 +48,9 @@ func go_die_qi_print_iter(qz *QiZi, tab int) {
 func go_die_qi_build_struct_helper(
 	i int, j int, root *QiZi, qizi *QiZi, index int) (err error) {
 	// go_die_qi_init_default(qizi->neibour[index], go_data[i][j], i, j);
+	// fmt.Printf("build(%d,%d)@%d\n",i,j,index)
 	if root.color == go_data[i][j] {
-		return go_die_qi_build_struct(i, j, root, qizi.neibour[index])
+		return go_die_qi_build_struct_(i, j, root, qizi.neibour[index])
 	} else {
 		qizi.neibour[index] = &QiZi{color: go_data[i][j], i: i, j: j}
 	}
@@ -77,39 +79,44 @@ func go_die_qi_in_(i int, j int, root *QiZi) bool {
 func go_die_qi_build_struct_helper_neibour(
 	i int, j int, root *QiZi, qizi *QiZi, index int) (err error) {
 	if i >= 0 && i < BOARD_SIZE && j >= 0 && j < BOARD_SIZE {
-		// printf("(%d,%d) in ? %d\n", i-1,j, go_die_qi_in_(i-1,j,root));
+		// fmt.Printf("(%d,%d) in ? %v\n", i,j, go_die_qi_in_(i,j,root))
 		if go_die_qi_in_(i, j, root) {
 			qizi.neibour[index] = nil
 		} else {
 			// printf("0 do (%d,%d)\n",i-1,j);
-			err = go_die_qi_build_struct_helper(i-1, j, root, qizi, 0)
+			err = go_die_qi_build_struct_helper(i, j, root, qizi, 0)
 			if err != nil {
 				return err
 			}
 		}
 	} else {
+		// 如不在棋盘内
 		qizi.neibour[index] = nil
 	}
 	return nil
 }
-func go_die_qi_build_struct(i int, j int, root *QiZi, qizi *QiZi) (err error) {
+func go_die_qi_build_struct_(i int, j int, root *QiZi, qizi *QiZi) (err error) {
 	// printf("building for (%d,%d) root@(%d,%d)\n", i,j,root->i,root->j);
 	// 0
+	fmt.Printf("do (%d,%d)@0\n", i-1, j)
 	err = go_die_qi_build_struct_helper_neibour(i-1, j, root, qizi, 0)
 	if err != nil {
 		return err
 	}
 	// 1
+	fmt.Printf("do (%d,%d)@1\n", i, j-1)
 	err = go_die_qi_build_struct_helper_neibour(i, j-1, root, qizi, 1)
 	if err != nil {
 		return err
 	}
 	// 2
+	fmt.Printf("do (%d,%d)@2\n", i, j+1)
 	err = go_die_qi_build_struct_helper_neibour(i, j+1, root, qizi, 2)
 	if err != nil {
 		return err
 	}
 	// 3
+	fmt.Printf("do (%d,%d)@3\n", i+1, j)
 	err = go_die_qi_build_struct_helper_neibour(i+1, j, root, qizi, 3)
 	if err != nil {
 		return err
@@ -117,13 +124,38 @@ func go_die_qi_build_struct(i int, j int, root *QiZi, qizi *QiZi) (err error) {
 	return nil
 }
 
+func go_die_qi_build_struct_iter_(i int, j int) (err error, qz QiZi) {
+	qz = QiZi{color: go_data[i][j], i: i, j: j}
+	qz.neibour[0] = go_die_qi_build_neibour_(i-1, j, &qz)
+	qz.neibour[1] = go_die_qi_build_neibour_(i, j-1, &qz)
+	qz.neibour[2] = go_die_qi_build_neibour_(i, j+1, &qz)
+	qz.neibour[3] = go_die_qi_build_neibour_(i+1, j, &qz)
+	for k := 0; k < 4; k++ {
+		qz.neibour[k].parent = &qz
+	}
+	return nil, qz
+}
+func go_die_qi_build_neibour_(i int, j int) (err error, qz QiZi) {
+	// 超出棋盘是nil，代表叶子节点
+	if !go_pos_in_board(i, j) {
+		return nil
+	}
+	// 防止无限递归
+	if qz.parent == nil || !(qz.parent.i == i && qz.parent.j == j) {
+		return go_die_qi_build_struct_iter_(i, j)
+	}
+	return nil
+}
+func go_pos_in_board(i int, j int) bool {
+	return i >= 0 && i < BOARD_SIZE && j >= 0 && j < BOARD_SIZE
+}
 func go_die_qi_get_(i int, j int, qz *QiZi) {
 	// int err = 0;
 	// go_color_t color = go_data[i][j];
 	// // assert(color != NONE); // 如果用户调用，则要保证不为 NONE
 	// qizi_t q;
 	// go_die_qi_init_default(&q,color,i,j);
-	// if (err = go_die_qi_build_struct(i,j,&q,&q)) {
+	// if (err = go_die_qi_build_struct_(i,j,&q,&q)) {
 	// 	assert(err == 0);
 	// }
 	// go_die_qi_print_iter(&q,0);
