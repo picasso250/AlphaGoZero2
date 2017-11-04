@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "fmt"
+	"fmt"
 	// "errors"
 	"log"
 )
@@ -29,17 +29,20 @@ var go_color_repr_map = [3]byte{'.', 'x', 'o'}
 
 func main() {
 	var err error
-	if err = one_move_(1, 3, WHITE); err != nil {
+	if err = one_move_(9, 10, WHITE); err != nil {
 		log.Fatal(err)
 	}
 	print_go_board()
 
-	nil_neibours := [...]*QiZi{nil, nil, nil, nil}
-	n0 := QiZi{NONE,8,10,nil_neibours}
-	n1 := QiZi{NONE,9,9,nil_neibours}
-	n2 := QiZi{NONE,9,11,nil_neibours}
-	n3 := QiZi{NONE,10,10,nil_neibours}
+	// nil_neibours := [...]*QiZi{nil, nil, nil, nil}
+	n0 := QiZi{color: NONE, i: 8, j: 10}  //,nil_neibours}
+	n1 := QiZi{color: NONE, i: 9, j: 9}   //,nil_neibours}
+	n2 := QiZi{color: NONE, i: 9, j: 11}  //,nil_neibours}
+	n3 := QiZi{color: NONE, i: 10, j: 10} //,nil_neibours}
 	qz_neibours := [...]*QiZi{&n0, &n1, &n2, &n3}
-	qz := QiZi{2, 9, 10, qz_neibours}
+	qz := QiZi{WHITE, 9, 10, qz_neibours}
 	go_die_qi_print_iter(&qz, 0)
+	fmt.Printf("(9,10) in? %v \n", go_die_qi_in_(9,10,&qz))
+	fmt.Printf("(8,10) in? %v \n", go_die_qi_in_(8,10,&qz))
+	fmt.Printf("(7,10) in? %v \n", go_die_qi_in_(7,10,&qz))
 }
