@@ -48,9 +48,10 @@ func main() {
 	// fmt.Printf("(9,10) in? %v \n", go_die_qi_in_(9,10,&qz))
 	// fmt.Printf("(8,10) in? %v \n", go_die_qi_in_(8,10,&qz))
 	// fmt.Printf("(7,10) in? %v \n", go_die_qi_in_(7,10,&qz))
-	qz := QiZi{color:WHITE, i:9, j:10}
-	go_die_qi_build_struct_(9,10,&qz,&qz)
-	go_die_qi_print_iter(&qz, 0)
+	// qz := QiZi{color:WHITE, i:9, j:10}
+	qz:=go_die_qi_build_struct_iter_(9,10)
+
+	go_die_qi_print_iter(qz, 0)
 
 	fmt.Printf("OK\n");
 }
