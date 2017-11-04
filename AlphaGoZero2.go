@@ -34,7 +34,12 @@ func main() {
 	}
 	print_go_board()
 
-	qz_neibour := [...]*QiZi{nil, nil, nil, nil}
-	qz := QiZi{2, 9, 10, qz_neibour}
+	nil_neibours := [...]*QiZi{nil, nil, nil, nil}
+	n0 := QiZi{NONE,8,10,nil_neibours}
+	n1 := QiZi{NONE,9,9,nil_neibours}
+	n2 := QiZi{NONE,9,11,nil_neibours}
+	n3 := QiZi{NONE,10,10,nil_neibours}
+	qz_neibours := [...]*QiZi{&n0, &n1, &n2, &n3}
+	qz := QiZi{2, 9, 10, qz_neibours}
 	go_die_qi_print_iter(&qz, 0)
 }
