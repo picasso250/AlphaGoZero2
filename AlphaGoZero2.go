@@ -29,6 +29,7 @@ var go_color_repr_map = [3]byte{'.', 'x', 'o'}
 
 func main() {
 	var err error
+	go_vetex_data_init()
 	if err = one_move_(9, 10, WHITE); err != nil {
 		log.Fatal(err)
 	}
@@ -37,21 +38,16 @@ func main() {
 	}
 	print_go_board()
 
-	// nil_neibours := [...]*QiZi{nil, nil, nil, nil}
-	// n0 := QiZi{color: NONE, i: 8, j: 10}  //,nil_neibours}
-	// n1 := QiZi{color: NONE, i: 9, j: 9}   //,nil_neibours}
-	// n2 := QiZi{color: NONE, i: 9, j: 11}  //,nil_neibours}
-	// n3 := QiZi{color: NONE, i: 10, j: 10} //,nil_neibours}
-	// qz_neibours := [...]*QiZi{&n0, &n1, &n2, &n3}
-	// qz := QiZi{WHITE, 9, 10, qz_neibours}
-	// go_die_qi_print_iter(&qz, 0)
-	// fmt.Printf("(9,10) in? %v \n", go_die_qi_in_(9,10,&qz))
-	// fmt.Printf("(8,10) in? %v \n", go_die_qi_in_(8,10,&qz))
-	// fmt.Printf("(7,10) in? %v \n", go_die_qi_in_(7,10,&qz))
-	// qz := QiZi{color:WHITE, i:9, j:10}
-	qz:=go_die_qi_build_struct_iter_(9,10)
-
-	go_die_qi_print_iter(qz, 0)
+	// fmt.Printf("qi of (9,9) is %d\n",go_get_qi(9,9))
+	s:=NewGoEdgeSet()
+	_,exists:=s.Get(&go_vertex_data[9][10],&go_vertex_data[9][9])
+	fmt.Printf("(9,10)-(9,9) exists? %v (should be no)\n",exists)
+	is_add:=s.Add(&go_vertex_data[9][10],&go_vertex_data[9][9],CONNECT)
+	fmt.Printf("add (9,10)-(9,9)? %v (should be yes)\n",is_add)
+	_,exists=s.Get(&go_vertex_data[9][10],&go_vertex_data[9][9])
+	fmt.Printf("(9,10)-(9,9) exists? %v (should be yes)\n",exists)
+	_,exists=s.Get(&go_vertex_data[9][9],&go_vertex_data[9][10])
+	fmt.Printf("(9,9)-(9,10) exists? %v (should be yes)\n",exists)
 
 	fmt.Printf("OK\n");
 }

@@ -37,5 +37,7 @@ func one_move_(i int, j int, color go_color) (err error) {
 		return errors.New("can not move on an already point")
 	}
 	go_data[i][j] = color
+	go_vertex_data[i][j].color = color
+	go_update_edge(i,j)
 	return nil
 }
