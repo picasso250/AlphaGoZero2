@@ -7,6 +7,8 @@ import (
 )
 
 func main() {
+	log.SetFlags(log.Lshortfile)
+
 	var err error
 	go_vetex_data_init()
 	if err = one_move_(9, 10, WHITE); err != nil {
@@ -15,6 +17,7 @@ func main() {
 	if err = one_move_(9, 9, WHITE); err != nil {
 		log.Fatal(err)
 	}
+	un_move_(9, 10)
 	print_go_board()
 	// fmt.Printf("edge of (9,9):\n")
 	// for k:=0;k<4;k++ {
@@ -33,8 +36,8 @@ func main() {
 	// _, exists = s.Get(&go_vertex_data[9][9], &go_vertex_data[9][10])
 	// fmt.Printf("(9,9)-(9,10) exists? %v (should be yes)\n", exists)
 
-	// vs, es := go_find_color_block(9, 9)
-	// fmt.Printf("vs: %s\nes: %s\n", vs, es)
+	vs, es := go_find_color_block(9, 9)
+	fmt.Printf("vs: %s\nes: %s\n", vs, es)
 	q := GoGetQi(9, 9)
 	fmt.Printf("(9,9) qi=%d\n", q)
 

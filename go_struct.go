@@ -120,7 +120,20 @@ func (e *GoEdge) IsSecondV(i int, j int) bool {
 	return e.v2.i == i && e.v2.j == j
 }
 func (e *GoEdge) UpdateByV() {
-	e._updateEdge()
+	if e.v2 == nil {
+		e.type_ = BLOCK
+	} else if e.v1.color == e.v2.color {
+		// fmt.Printf("_updateEdge %s.color=%d, %s.color=%d CONNECT\n",e.v1,e.v1.color,e.v2,e.v2.color)
+		// 当悔棋的时候，色可能为空
+		if e.v1.color == NONE {
+			e.type_ = OPEN
+		} else {
+			e.type_ = CONNECT
+		}
+	} else {
+		// fmt.Printf("_updateEdge %s.color=%d, %s.color=%d OPEN\n",e.v1,e.v1.color,e.v2,e.v2.color)
+		e.type_ = OPEN
+	}
 }
 func (e *GoEdge) IsSameColor() bool {
 	return e.v1.color == e.v2.color
@@ -134,16 +147,4 @@ func (e *GoEdge) GetOtherV(i int, j int) *GoVertex {
 	}
 	assert(false)
 	return nil
-}
-
-func (e *GoEdge) _updateEdge() {
-	if e.v2 == nil {
-		e.type_ = BLOCK
-	} else if e.v1.color == e.v2.color {
-		// fmt.Printf("_updateEdge %s.color=%d, %s.color=%d CONNECT\n",e.v1,e.v1.color,e.v2,e.v2.color)
-		e.type_ = CONNECT
-	} else {
-		// fmt.Printf("_updateEdge %s.color=%d, %s.color=%d OPEN\n",e.v1,e.v1.color,e.v2,e.v2.color)
-		e.type_ = OPEN
-	}
 }

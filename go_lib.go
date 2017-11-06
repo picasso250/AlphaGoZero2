@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"runtime/debug"
 )
 
 // 棋盘大小
@@ -29,6 +30,7 @@ func print_go_board() {
 
 func assert(cond bool) {
 	if !cond {
+		debug.PrintStack()
 		log.Fatal(cond)
 	}
 }
@@ -56,4 +58,12 @@ func one_move_(i int, j int, color GoColor) (err error) {
 	// 是否死了，谁死了？
 	// 如何提子？
 	return nil
+}
+// 悔棋(计算机版本)
+func un_move_(i int, j int) {
+	assert(i >= 0 && i < BOARD_SIZE)
+	assert(j >= 0 && j < BOARD_SIZE)
+	assert(go_vertex_data[i][j].color != NONE)
+	go_vertex_data[i][j].color = NONE
+	go_update_edge(i, j)
 }
