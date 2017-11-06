@@ -3,10 +3,10 @@
 package main
 
 import (
-	// "fmt"
-	// "strings"
-	// "errors"
-	// "log"
+// "fmt"
+// "strings"
+// "errors"
+// "log"
 )
 
 type GoEdgeSet struct {
@@ -25,34 +25,60 @@ func (s *GoEdgeSet) Get(v1 *GoVertex, v2 *GoVertex) (int, bool) {
 	type_, ok = s.m[[2]*GoVertex{v2, v1}]
 	return type_, ok
 }
-func (s *GoEdgeSet) Add(v1 *GoVertex, v2 *GoVertex, type_ int) bool {
-	_, ok := s.Get(v1,v2)
+func (s *GoEdgeSet) Add(e *GoEdge) bool {
+	_, ok := s.Get(e.v1, e.v2)
 	if !ok {
-		s.m[[2]*GoVertex{v1, v2}] = type_
+		s.m[[2]*GoVertex{e.v1, e.v2}] = e.type_
 	}
 	return !ok // 是否添加了新元素
 }
+func (s *GoEdgeSet) AddByVertex(v *GoVertex) bool {
+	is_add := false
+	for k := 0; k < 4; k++ {
+		is_add = is_add|| s.Add(&v.edge[k])
+	}
+	return !is_add // 是否添加了新元素
+}
 
+// 点的集合
 type GoVertexSet struct {
-	m map[[2]int]go_color
+	m map[*GoVertex]bool
 }
 
 func NewGoVertexSet() (s *GoVertexSet) {
-	m :=make(map[[2]int]go_color)
+	m := make(map[*GoVertex]bool)
 	return &GoVertexSet{m}
 }
-func (s *GoVertexSet) Get(i int, j int) (go_color, bool) {
-	color, ok := s.m[[2]int{i, j}]
-	if ok {
-		return color, ok
-	}
-	color, ok = s.m[[2]int{j, i}]
-	return color, ok
+func (s *GoVertexSet) Get(v *GoVertex) (bool, bool) {
+	v_, ok := s.m[v]
+	return v_, ok
 }
-func (s *GoVertexSet) Add(i int, j int, color go_color) bool {
-	_, ok := s.Get(i, j)
+func (s *GoVertexSet) Add(v *GoVertex) bool {
+	_, ok := s.m[v]
 	if !ok {
-		s.m[[2]int{j, i}] = color
+		s.m[v] = true
 	}
 	return !ok // 是否添加了新元素
+}
+func (s *GoVertexSet) AddEdge(e *GoEdge) bool {
+	is_add1 := false
+	is_add2 := false
+	if e.v1 != nil {
+		is_add1 = s.Add(e.v1)
+	}
+	if e.v2 != nil {
+		is_add2 = s.Add(e.v2)
+	}
+	return is_add1 || is_add2 // 是否添加了新元素
+}
+func (s *GoVertexSet) AddEdgeByTwoVertex(vs [2]*GoVertex) bool {
+	is_add1 := false
+	is_add2 := false
+	if vs[0] != nil {
+		is_add1 = s.Add(vs[0])
+	}
+	if vs[1] != nil {
+		is_add2 = s.Add(vs[1])
+	}
+	return is_add1 || is_add2 // 是否添加了新元素
 }

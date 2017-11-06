@@ -39,15 +39,16 @@ func main() {
 	print_go_board()
 
 	// fmt.Printf("qi of (9,9) is %d\n",go_get_qi(9,9))
-	s:=NewGoEdgeSet()
-	_,exists:=s.Get(&go_vertex_data[9][10],&go_vertex_data[9][9])
-	fmt.Printf("(9,10)-(9,9) exists? %v (should be no)\n",exists)
-	is_add:=s.Add(&go_vertex_data[9][10],&go_vertex_data[9][9],CONNECT)
-	fmt.Printf("add (9,10)-(9,9)? %v (should be yes)\n",is_add)
-	_,exists=s.Get(&go_vertex_data[9][10],&go_vertex_data[9][9])
-	fmt.Printf("(9,10)-(9,9) exists? %v (should be yes)\n",exists)
-	_,exists=s.Get(&go_vertex_data[9][9],&go_vertex_data[9][10])
-	fmt.Printf("(9,9)-(9,10) exists? %v (should be yes)\n",exists)
+	s := NewGoEdgeSet()
+	_, exists := s.Get(&go_vertex_data[9][10], &go_vertex_data[9][9])
+	fmt.Printf("(9,10)-(9,9) exists? %v (should be no)\n", exists)
+	e:=GoEdge{&go_vertex_data[9][10], &go_vertex_data[9][9], CONNECT}
+	is_add := s.Add(&e)
+	fmt.Printf("add (9,10)-(9,9)? %v (should be yes)\n", is_add)
+	_, exists = s.Get(&go_vertex_data[9][10], &go_vertex_data[9][9])
+	fmt.Printf("(9,10)-(9,9) exists? %v (should be yes)\n", exists)
+	_, exists = s.Get(&go_vertex_data[9][9], &go_vertex_data[9][10])
+	fmt.Printf("(9,9)-(9,10) exists? %v (should be yes)\n", exists)
 
-	fmt.Printf("OK\n");
+	fmt.Printf("OK\n")
 }

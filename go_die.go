@@ -1,12 +1,11 @@
-// 死活
-
 package main
 
+// 死活
 import (
-	// "fmt"
-	// "strings"
-	// "errors"
-	"log"
+// "fmt"
+// "strings"
+// "errors"
+// "log"
 )
 
 // 边的结构 E(V_1,V_2)
@@ -21,7 +20,7 @@ import (
 //     2. 新增开放边
 // 找出V所在的棋块
 // 目标：
-//   1. 找出V所在棋块中所有的同色棋子V_c
+//   1. 找出V所在棋块中所有的同色棋子V_c(找出棋块)
 //   2. 找出这些棋子所相关的边M_E
 //   3. 找出这些边的边缘棋子（中类型为开的）
 //   遍历V相关的E
@@ -35,53 +34,77 @@ import (
 // 当然，我们保证：当一个棋子被下在棋盘上时，它相关的4个E都将会存在
 
 // 顶点（代表棋子）
+// edge中不会有nil元素，即使它是壁，此时为闭类型
 type GoVertex struct {
 	i     int
 	j     int
 	color go_color
-	edge  [4]*GoEdge
+	edge  [4]GoEdge // 默认为开
 }
-
-// 边
-// 有可能其中一个点在棋盘外，此时这个点用nil表示
-type GoEdge struct {
-	v1  *GoVertex
-	v2  *GoVertex
-	typ int
-}
-
-// 边的类型
-const (
-	CONNECT = 0
-	BLOCK   = 1
-	OPEN    = 2
-)
-
-type GoEqualAble interface {
-	Equal() bool
-}
-
-var go_edge_data []GoEdge
-var go_vertex_data [BOARD_SIZE][BOARD_SIZE]GoVertex
 
 func (v *GoVertex) Equal(w *GoVertex) bool {
 	return v.i == w.i && v.j == w.j
 }
 func (v *GoVertex) IsAnyOpenEdge() bool {
 	for k := 0; k < 4; k++ {
-		if v.edge[k].typ == OPEN {
+		if v.edge[k].type_ == OPEN {
 			return true
 		}
 	}
 	return false
 }
-func (v *GoVertex) GetAllEdgeSlice() (es []*GoEdge) {
+func (v *GoVertex) InitEdge() {
 	for k := 0; k < 4; k++ {
-		es = append(es, v.edge[k])
+		v.edge[k].v1 = v
 	}
-	return es
+	i := v.i
+	j := v.j
+	v.InitEdge_(0, i-1, j)
+	v.InitEdge_(1, i, j-1)
+	v.InitEdge_(2, i, j+1)
+	v.InitEdge_(3, i+1, j)
+}
+func (v *GoVertex) InitEdge_(index int, i int, j int) {
+	if go_pos_in_board(i, j) {
+		v.edge[index].v2 = &go_vertex_data[i][j]
+	}
 }
 
+// 边
+// 有可能其中一个点在棋盘外，此时这个点用nil表示
+type GoEdge struct {
+	v1    *GoVertex
+	v2    *GoVertex
+	type_ int
+}
+
+// 边的类型
+const (
+	OPEN    = 0
+	CONNECT = 1
+	BLOCK   = 2
+)
+
+type GoEqualAble interface {
+	Equal() bool
+}
+
+var go_vertex_data [BOARD_SIZE][BOARD_SIZE]GoVertex
+
+func (e *GoEdge) Reverse() GoEdge {
+	return GoEdge{v1: e.v2, v2: e.v1}
+}
+func (e *GoEdge) GetNoneVertex() (v *GoVertex) {
+	assert(e.type_ == NONE)
+	assert(e.v1 != nil)
+	assert(e.v2 != nil)
+	v1_is_none := e.v1.color == NONE
+	if v1_is_none {
+		return e.v1
+	} else {
+		return e.v2
+	}
+}
 func (e *GoEdge) GetAllPointSlice() (vs []*GoVertex) {
 	vs = append(vs, e.v1, e.v2)
 	return vs
@@ -98,8 +121,8 @@ func (e *GoEdge) IsFirstV(i int, j int) bool {
 func (e *GoEdge) IsSecondV(i int, j int) bool {
 	return e.v2.i == i && e.v2.j == j
 }
-func (e *GoEdge) UpdateByV(i int, j int) {
-	e._updateEdge(i, j)
+func (e *GoEdge) UpdateByV() {
+	e._updateEdge()
 }
 func (e *GoEdge) IsSameColor() bool {
 	return e.v1.color == e.v2.color
@@ -115,11 +138,13 @@ func (e *GoEdge) GetOtherV(i int, j int) *GoVertex {
 	return nil
 }
 
-func (e *GoEdge) _updateEdge(i int, j int) {
-	if e.IsSameColor() {
-		e.typ = CONNECT
+func (e *GoEdge) _updateEdge() {
+	if e.v2 != nil {
+		e.type_ = OPEN
+	} else if e.v1.color == e.v2.color {
+		e.type_ = CONNECT
 	} else {
-		e.typ = BLOCK
+		e.type_ = BLOCK
 	}
 }
 
@@ -127,23 +152,19 @@ func go_vetex_data_init() {
 	for i := 0; i < BOARD_SIZE; i++ {
 		for j := 0; j < BOARD_SIZE; j++ {
 			go_vertex_data[i][j] = GoVertex{i: i, j: j}
+
+		}
+	}
+	// init edge
+	// 边的初始化一定要在所有的点初始化完毕之后
+	// 因为边的初始化过程中使用了邻居点
+	for i := 0; i < BOARD_SIZE; i++ {
+		for j := 0; j < BOARD_SIZE; j++ {
+			go_vertex_data[i][j].InitEdge()
 		}
 	}
 }
 
-func goNewEdge(v1 *GoVertex, v2 *GoVertex) *GoEdge {
-	var t int
-	if v2.color == NONE {
-		t = OPEN
-	} else if v1.color == v2.color {
-		t = CONNECT
-	} else {
-		t = BLOCK
-	}
-	e := GoEdge{v1, v2, t}
-	go_connect_to(v2, v1, &e)
-	return &e
-}
 func go_pos_in_board(i int, j int) bool {
 	return i >= 0 && i < BOARD_SIZE && j >= 0 && j < BOARD_SIZE
 }
@@ -165,37 +186,18 @@ func go_update_edge(i int, j int) {
 	go_update_edge_r(1, i, j+1, e2)
 	go_update_edge_r(0, i+1, j, e3)
 }
-func go_update_edge_(v *GoVertex, index int, i int, j int) *GoEdge {
-	if v.edge[index] == nil {
-		v.edge[index] = goNewEdgeVoid(v, i, j)
-	} else {
-		v.edge[index].UpdateByV(i, j)
-	}
+
+// 更新v的index边，另一个棋子为(i,j)
+func go_update_edge_(v *GoVertex, index int, i int, j int) GoEdge {
+	v.edge[index].UpdateByV()
 	return v.edge[index]
 }
-func go_update_edge_r(index int, i int, j int, e *GoEdge) {
+func go_update_edge_r(index int, i int, j int, e GoEdge) {
 	if go_pos_in_board(i, j) {
-		go_vertex_data[i][j].edge[index] = e
+		go_vertex_data[i][j].edge[index] = e.Reverse()
 	}
 }
 
-// 新建边（边有可能在棋盘外，故处理这种情况）
-func goNewEdgeVoid(v *GoVertex, i int, j int) (e *GoEdge) {
-	if !go_pos_in_board(i, j) {
-		e = &GoEdge{v, nil, BLOCK}
-	} else {
-		e = goNewEdge(v, &go_vertex_data[i][j])
-	}
-	go_edge_data = append(go_edge_data, *e)
-	return e
-}
-func go_connect_to(v_lost_edge *GoVertex, v *GoVertex, e *GoEdge) {
-	index := go_get_edge_index_by(v_lost_edge, v)
-	if index == -1 {
-		log.Fatal("no good index")
-	}
-	v_lost_edge.edge[index] = e
-}
 func go_get_edge_index_by(v_subject *GoVertex, v_object *GoVertex) int {
 	if v_subject.i == v_object.i {
 		if v_subject.j-1 == v_object.j {
@@ -216,69 +218,66 @@ func go_get_edge_index_by(v_subject *GoVertex, v_object *GoVertex) int {
 	return -1
 }
 
-// 找到和(i,j)相关的边
-func go_find_all_edges_about(i int, j int) (es []*GoEdge) {
-	for k := 0; k < 4; k++ {
-		es = append(es, go_vertex_data[i][j].edge[k])
-	}
-	return es
-}
-
 // 气=qi(M)=count{V|V所属的E是开类型}
-// func go_get_qi(i int, j int) int {
-// 	assert(go_data[i][j] != NONE)
-// 	vs, es := go_get_all_block_about(i, j)
-// 	return go_count_color_and_open(vs)
-// }
-// func go_count_color_and_open(vs []*GoVertex) int {
-// 	q := 0
-// 	for _, v := range vs {
-// 		if v.IsAnyOpenEdge() && v.color == NONE {
-// 			q++
-// 		}
-// 	}
-// 	return q
-// }
+func go_get_qi(i int, j int) int {
+	assert(go_data[i][j] != NONE)
+	_, es := go_find_color_block(i, j)
+	return go_count_open(es)
+}
+func go_count_open(es *GoEdgeSet) int {
+	vs := NewGoVertexSet()
+	for v1v2, type_ := range es.m {
+		if type_ == OPEN {
+			if v1v2[0] != nil {
+				vs.Add(v1v2[0])
+			} else {
+				vs.Add(v1v2[1])
+			}
+		}
+	}
+	return len(vs.m)
+}
 
 // 获得棋子块相关的所有边和点
 // func go_get_all_block_about(i int, j int) ([]*GoVertex, []*GoEdge) {
 // 	vs := make([]*GoVertex, 1)
 // 	vs[0] = &go_vertex_data[i][j]
-// 	es := go_find_all_edges_about(i, j)
-// 	vs, es = go_get_all_block_about_color_iter(vs, es)
-// 	vs = go_add_not_color_edge(vs, es)
+// 	vs,es := go_find_color_block(i, j)
+// 	vs = go_add_not_color_edge(es)
 // 	return vs, es
-// }
-// func go_add_not_color_edge(vs []*GoVertex, es []*GoEdge) (r_vs []*GoVertex) {
-// 	var vs_ []*GoVertex
-// 	for _, e := range es {
-// 		vs_ = append(vs_, e.GetAllPointSlice()...)
-// 	}
-// 	r_vs, _ = go_vertex_comb(vs, vs_)
-// 	return r_vs
 // }
 
 // 获得棋子块相关的所有边和点（同色）
-// func go_get_all_block_about_color_iter(vs []*GoVertex, es []*GoEdge) ([]*GoVertex, []*GoEdge) {
-// 	var vs_ []*GoVertex
-// 	var es_ []*GoEdge
-// 	for _, e := range es {
-// 		if e.typ == CONNECT {
-// 			vs_ = append(vs_, e.GetAllPointSlice()...)
-// 		} else {
-// 			return vs_, es_
-// 		}
-// 	}
-// 	vs, new_coming_v := go_vertex_comb(vs, vs_)
-// 	if !new_coming_v {
-// 		return vs, es
-// 	}
-// 	for _, v := range vs {
-// 		es_ = append(es_, v.GetAllEdgeSlice()...)
-// 	}
-// 	es, _ = go_edge_comb(es, es_)
-// 	return go_get_all_block_about_color_iter(vs, es)
-// }
+func go_find_color_block(i int, j int) (*GoVertexSet, *GoEdgeSet) {
+	vs := NewGoVertexSet()
+	vs.Add(&go_vertex_data[i][j])
+	return go_find_color_block_iter(vs, NewGoEdgeSet())
+}
+func go_find_color_block_iter(
+	vs *GoVertexSet, es *GoEdgeSet) (*GoVertexSet, *GoEdgeSet) {
+	// var es_ []*GoEdge
+	new_coming_v := false
+	for v1v2, type_ := range es.m {
+		if type_ == CONNECT {
+			if vs.AddEdgeByTwoVertex(v1v2) {
+				new_coming_v = true
+			}
+		} else {
+			continue
+		}
+	}
+	new_coming_e := false
+	for v, _ := range vs.m {
+		if es.AddByVertex(v) { // 将v的所有邻居加入
+			new_coming_e = true
+		}
+	}
+	if !new_coming_v && !new_coming_e {
+		return vs, es
+	}
+	return go_find_color_block_iter(vs, es)
+}
+
 // func go_vertex_comb(a []*GoVertex, b []*GoVertex) (c []*GoVertex, new_coming bool) {
 // 	for _, v := range b {
 // 		if !go_in_xs(v, a) {
