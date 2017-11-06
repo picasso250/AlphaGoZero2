@@ -15,21 +15,23 @@ func main() {
 
 	var err error
 	go_vetex_data_init()
-	if err = GoOneMove(5, 5, BLACK); err != nil {
+	if err = GoOneMove(0, 0, BLACK); err != nil {
 		log.Fatal(err)
 	}
-	if err = GoOneMove(4, 5, WHITE); err != nil {
+	print_go_board()
+	GoPrintPanMian()
+	if err = GoOneMove(1, 1, WHITE); err != nil {
 		log.Fatal(err)
 	}
-	if err = GoOneMove(6, 5, WHITE); err != nil {
-		log.Fatal(err)
-	}
-	if err = GoOneMove(5, 4, WHITE); err != nil {
-		log.Fatal(err)
-	}
-	if err = GoOneMove(5, 6, WHITE); err != nil {
-		log.Fatal(err)
-	}
+	// if err = GoOneMove(6, 5, WHITE); err != nil {
+	// 	log.Fatal(err)
+	// }
+	// if err = GoOneMove(5, 4, WHITE); err != nil {
+	// 	log.Fatal(err)
+	// }
+	// if err = GoOneMove(5, 6, WHITE); err != nil {
+	// 	log.Fatal(err)
+	// }
 	print_go_board()
 	// fmt.Printf("edge of (5,9):\n")
 	// for k := 0; k < 4; k++ {
@@ -39,6 +41,9 @@ func main() {
 	// vs, es := go_find_color_block(9, 9)
 	// fmt.Printf("vs: %s\nes: %s\n", vs, es)
 	// q := GoGetQi(9, 9)
+
+	GoPrintPanMian()
+	return
 
 	for {
 		fmt.Printf("playing: ")

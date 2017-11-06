@@ -10,7 +10,7 @@ import (
 )
 
 // 棋盘大小
-const BOARD_SIZE = 9
+const BOARD_SIZE = 2
 
 // 棋盘数据
 var go_vertex_data [BOARD_SIZE][BOARD_SIZE]GoVertex
@@ -47,7 +47,6 @@ func GoOneMove(i int, j int, color GoColor) (err error) {
 	tizi := false
 	for k := 0; k < 4; k++ {
 		v_other := v.edge[k].v2
-		// assert(v_other!=nil)
 		if v_other!=nil && v_other.color == v.color.Reverse() {
 			q := GoGetQi(v_other.i, v_other.j)
 			// fmt.Printf("%s -> %s =%d(气)\n", v, v_other, q)
@@ -98,4 +97,26 @@ func un_move_(i int, j int) {
 	assert(go_vertex_data[i][j].color != NONE)
 	go_vertex_data[i][j].color = NONE
 	go_update_edge(i, j)
+}
+// 盘面胜负
+func GoGetPanMian() (map[GoColor]int) {
+	m:=make(map[GoColor]int)
+	for i := 0; i < BOARD_SIZE; i++ {
+		for j := 0; j < BOARD_SIZE; j++ {
+			v:=go_vertex_data[i][j]
+			if v.color!=NONE {
+				m[v.color]++
+			} else {
+				c:=v.GetOwnerColor()
+				if c!=NONE {
+					m[c]++
+				}
+			}
+		}
+	}
+	return m
+}
+func GoPrintPanMian() {
+	m:=GoGetPanMian()
+	fmt.Printf("黑：%d 白: %d\n", m[BLACK],m[WHITE])
 }

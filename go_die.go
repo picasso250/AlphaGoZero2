@@ -37,7 +37,6 @@ func go_vetex_data_init() {
 	for i := 0; i < BOARD_SIZE; i++ {
 		for j := 0; j < BOARD_SIZE; j++ {
 			go_vertex_data[i][j] = GoVertex{i: i, j: j}
-
 		}
 	}
 	// init edge

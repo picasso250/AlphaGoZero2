@@ -49,6 +49,22 @@ func GoColorMapRev() map[string]GoColor {
 	}
 	return m
 }
+// 对空点，找出其所属的势力（颜色）
+func (v *GoVertex) GetOwnerColor() (color GoColor) {
+	assert(v.color==NONE)
+	m:=make(map[GoColor]bool)
+	for k:=0;k<4;k++ {
+		neibour:=v.edge[k].v2
+		if neibour!=nil {
+			m[neibour.color]=true
+			color=neibour.color
+		}
+	}
+	if len(m)==1 {
+		return color
+	}
+	return NONE
+}
 func (v *GoVertex) ToStr() string {
 	return fmt.Sprintf("(%d,%d)", v.i, v.j)
 }
