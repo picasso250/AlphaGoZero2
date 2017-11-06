@@ -2,7 +2,7 @@ package main
 
 // 死活
 import (
-	"fmt"
+	// "fmt"
 	// "strings"
 	// "errors"
 	// "log"
@@ -32,132 +32,6 @@ import (
 //   遍历E中所有的V，根据颜色可以找出棋块中棋子的数量
 //   气=qi(M)=count{V|V所属的E是开类型，且V是空点}
 // 当然，我们保证：当一个棋子被下在棋盘上时，它相关的4个E都将会存在
-
-// 顶点（代表棋子）
-// edge中不会有nil元素，即使它是壁，此时为闭类型
-type GoVertex struct {
-	i     int
-	j     int
-	color go_color
-	edge  [4]GoEdge // 默认为开
-}
-
-func (v *GoVertex) ToStr() string {
-	return fmt.Sprintf("(%d,%d)", v.i, v.j)
-}
-func (v *GoVertex) String() string {
-	return fmt.Sprintf("(%d,%d)", v.i, v.j)
-}
-func (v *GoVertex) Equal(w *GoVertex) bool {
-	return v.i == w.i && v.j == w.j
-}
-func (v *GoVertex) IsAnyOpenEdge() bool {
-	for k := 0; k < 4; k++ {
-		if v.edge[k].type_ == OPEN {
-			return true
-		}
-	}
-	return false
-}
-func (v *GoVertex) InitEdge() {
-	for k := 0; k < 4; k++ {
-		v.edge[k].v1 = v
-	}
-	i := v.i
-	j := v.j
-	v.InitEdge_(0, i-1, j)
-	v.InitEdge_(1, i, j-1)
-	v.InitEdge_(2, i, j+1)
-	v.InitEdge_(3, i+1, j)
-}
-func (v *GoVertex) InitEdge_(index int, i int, j int) {
-	if go_pos_in_board(i, j) {
-		v.edge[index].v2 = &go_vertex_data[i][j]
-	}
-}
-
-// 边
-// 有可能其中一个点在棋盘外，此时这个点用nil表示
-type GoEdge struct {
-	v1    *GoVertex
-	v2    *GoVertex
-	type_ int
-}
-
-// 边的类型
-const (
-	OPEN    = 0
-	CONNECT = 1
-	BLOCK   = 2
-)
-
-type GoEqualAble interface {
-	Equal() bool
-}
-
-var go_vertex_data [BOARD_SIZE][BOARD_SIZE]GoVertex
-
-func (e *GoEdge) String() string {
-	return fmt.Sprintf("%s-%s(%d)", e.v1, e.v2, e.type_)
-}
-func (e *GoEdge) Reverse() GoEdge {
-	return GoEdge{e.v2, e.v1, e.type_}
-}
-func (e *GoEdge) GetNoneVertex() (v *GoVertex) {
-	assert(e.type_ == NONE)
-	assert(e.v1 != nil)
-	assert(e.v2 != nil)
-	v1_is_none := e.v1.color == NONE
-	if v1_is_none {
-		return e.v1
-	} else {
-		return e.v2
-	}
-}
-func (e *GoEdge) GetAllPointSlice() (vs []*GoVertex) {
-	vs = append(vs, e.v1, e.v2)
-	return vs
-}
-func (e *GoEdge) Equal(ee *GoEdge) bool {
-	return e == ee
-}
-func (e *GoEdge) ContainV(i int, j int) bool {
-	return e.IsFirstV(i, j) || e.IsSecondV(i, j)
-}
-func (e *GoEdge) IsFirstV(i int, j int) bool {
-	return e.v1.i == i && e.v1.j == j
-}
-func (e *GoEdge) IsSecondV(i int, j int) bool {
-	return e.v2.i == i && e.v2.j == j
-}
-func (e *GoEdge) UpdateByV() {
-	e._updateEdge()
-}
-func (e *GoEdge) IsSameColor() bool {
-	return e.v1.color == e.v2.color
-}
-func (e *GoEdge) GetOtherV(i int, j int) *GoVertex {
-	if e.v1.i == i && e.v1.j == j {
-		return e.v2
-	}
-	if e.v2.i == i && e.v2.j == j {
-		return e.v1
-	}
-	assert(false)
-	return nil
-}
-
-func (e *GoEdge) _updateEdge() {
-	if e.v2 == nil {
-		e.type_ = BLOCK
-	} else if e.v1.color == e.v2.color {
-		// fmt.Printf("_updateEdge %s.color=%d, %s.color=%d CONNECT\n",e.v1,e.v1.color,e.v2,e.v2.color)
-		e.type_ = CONNECT
-	} else {
-		// fmt.Printf("_updateEdge %s.color=%d, %s.color=%d OPEN\n",e.v1,e.v1.color,e.v2,e.v2.color)
-		e.type_ = OPEN
-	}
-}
 
 func go_vetex_data_init() {
 	for i := 0; i < BOARD_SIZE; i++ {
@@ -231,7 +105,7 @@ func go_get_edge_index_by(v_subject *GoVertex, v_object *GoVertex) int {
 
 // 气=qi(M)=count{V|V所属的E是开类型}
 func GoGetQi(i int, j int) int {
-	assert(go_data[i][j] != NONE)
+	assert(go_vertex_data[i][j].color != NONE)
 	_, es := go_find_color_block(i, j)
 	return go_count_open(es)
 }

@@ -6,27 +6,6 @@ import (
 	"log"
 )
 
-// 棋盘大小
-const BOARD_SIZE = 19
-
-// 棋盘数据
-// 0 无棋子
-// 1 黑子
-// 2 白子
-// Golang will init all value to zero
-// https://golang.org/ref/spec#Variable_declarations
-type go_color byte
-
-var go_data [BOARD_SIZE][BOARD_SIZE]go_color
-
-const (
-	NONE  = 0
-	BLACK = 1
-	WHITE = 2
-)
-
-var go_color_repr_map = [3]byte{'.', 'x', 'o'}
-
 func main() {
 	var err error
 	go_vetex_data_init()
@@ -54,8 +33,8 @@ func main() {
 	// _, exists = s.Get(&go_vertex_data[9][9], &go_vertex_data[9][10])
 	// fmt.Printf("(9,9)-(9,10) exists? %v (should be yes)\n", exists)
 
-	vs, es := go_find_color_block(9, 9)
-	fmt.Printf("vs: %s\nes: %s\n", vs, es)
+	// vs, es := go_find_color_block(9, 9)
+	// fmt.Printf("vs: %s\nes: %s\n", vs, es)
 	q := GoGetQi(9, 9)
 	fmt.Printf("(9,9) qi=%d\n", q)
 
