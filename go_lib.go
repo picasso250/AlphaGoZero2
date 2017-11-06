@@ -10,7 +10,7 @@ import (
 )
 
 // 棋盘大小
-const BOARD_SIZE = 19
+const BOARD_SIZE = 9
 
 // 棋盘数据
 var go_vertex_data [BOARD_SIZE][BOARD_SIZE]GoVertex
@@ -37,15 +37,6 @@ func assert(cond bool) {
 }
 
 // 是否是禁着点
-func IsForbidPoint(v GoVertex) bool {
-	assert(go_vertex_data[v.i][v.j].color == NONE)
-	// todo
-	// for k:=0;k<4;k++ {
-	// 	v.edge[k].v2
-	// }
-	return true
-}
-
 func GoOneMove(i int, j int, color GoColor) (err error) {
 	err = one_move_(i, j, color)
 	if err != nil {
@@ -56,7 +47,8 @@ func GoOneMove(i int, j int, color GoColor) (err error) {
 	tizi := false
 	for k := 0; k < 4; k++ {
 		v_other := v.edge[k].v2
-		if v_other.color == v.color.Reverse() {
+		// assert(v_other!=nil)
+		if v_other!=nil && v_other.color == v.color.Reverse() {
 			q := GoGetQi(v_other.i, v_other.j)
 			// fmt.Printf("%s -> %s =%d(气)\n", v, v_other, q)
 			if q == 0 {

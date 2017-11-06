@@ -36,8 +36,18 @@ type GoVertex struct {
 }
 
 func (v *GoVertex) ColorStr() string {
-	var GoColor_repr_map = [3]string{".", "x", "o"}
+	var GoColor_repr_map = GoColorMap()
 	return GoColor_repr_map[v.color]
+}
+func GoColorMap() [3]string {
+	return [3]string{".", "x", "o"}
+}
+func GoColorMapRev() map[string]GoColor {
+	m:=make(map[string]GoColor, 3)
+	for k,v:=range GoColorMap() {
+		m[v]= GoColor(k)
+	}
+	return m
 }
 func (v *GoVertex) ToStr() string {
 	return fmt.Sprintf("(%d,%d)", v.i, v.j)
