@@ -2,10 +2,10 @@ package main
 
 // 死活
 import (
-// "fmt"
-// "strings"
-// "errors"
-// "log"
+	"fmt"
+	// "strings"
+	// "errors"
+	// "log"
 )
 
 // 边的结构 E(V_1,V_2)
@@ -42,6 +42,12 @@ type GoVertex struct {
 	edge  [4]GoEdge // 默认为开
 }
 
+func (v *GoVertex) ToStr() string {
+	return fmt.Sprintf("(%d,%d)", v.i, v.j)
+}
+func (v *GoVertex) String() string {
+	return fmt.Sprintf("(%d,%d)", v.i, v.j)
+}
 func (v *GoVertex) Equal(w *GoVertex) bool {
 	return v.i == w.i && v.j == w.j
 }
@@ -91,8 +97,11 @@ type GoEqualAble interface {
 
 var go_vertex_data [BOARD_SIZE][BOARD_SIZE]GoVertex
 
+func (e *GoEdge) String() string {
+	return fmt.Sprintf("%s-%s(%d)", e.v1, e.v2, e.type_)
+}
 func (e *GoEdge) Reverse() GoEdge {
-	return GoEdge{v1: e.v2, v2: e.v1}
+	return GoEdge{e.v2, e.v1, e.type_}
 }
 func (e *GoEdge) GetNoneVertex() (v *GoVertex) {
 	assert(e.type_ == NONE)
@@ -139,12 +148,14 @@ func (e *GoEdge) GetOtherV(i int, j int) *GoVertex {
 }
 
 func (e *GoEdge) _updateEdge() {
-	if e.v2 != nil {
-		e.type_ = OPEN
+	if e.v2 == nil {
+		e.type_ = BLOCK
 	} else if e.v1.color == e.v2.color {
+		// fmt.Printf("_updateEdge %s.color=%d, %s.color=%d CONNECT\n",e.v1,e.v1.color,e.v2,e.v2.color)
 		e.type_ = CONNECT
 	} else {
-		e.type_ = BLOCK
+		// fmt.Printf("_updateEdge %s.color=%d, %s.color=%d OPEN\n",e.v1,e.v1.color,e.v2,e.v2.color)
+		e.type_ = OPEN
 	}
 }
 
@@ -219,7 +230,7 @@ func go_get_edge_index_by(v_subject *GoVertex, v_object *GoVertex) int {
 }
 
 // 气=qi(M)=count{V|V所属的E是开类型}
-func go_get_qi(i int, j int) int {
+func GoGetQi(i int, j int) int {
 	assert(go_data[i][j] != NONE)
 	_, es := go_find_color_block(i, j)
 	return go_count_open(es)
@@ -228,7 +239,9 @@ func go_count_open(es *GoEdgeSet) int {
 	vs := NewGoVertexSet()
 	for v1v2, type_ := range es.m {
 		if type_ == OPEN {
-			if v1v2[0] != nil {
+			assert(v1v2[0] != nil)
+			assert(v1v2[1] != nil)
+			if v1v2[0].color == NONE {
 				vs.Add(v1v2[0])
 			} else {
 				vs.Add(v1v2[1])
@@ -238,15 +251,6 @@ func go_count_open(es *GoEdgeSet) int {
 	return len(vs.m)
 }
 
-// 获得棋子块相关的所有边和点
-// func go_get_all_block_about(i int, j int) ([]*GoVertex, []*GoEdge) {
-// 	vs := make([]*GoVertex, 1)
-// 	vs[0] = &go_vertex_data[i][j]
-// 	vs,es := go_find_color_block(i, j)
-// 	vs = go_add_not_color_edge(es)
-// 	return vs, es
-// }
-
 // 获得棋子块相关的所有边和点（同色）
 func go_find_color_block(i int, j int) (*GoVertexSet, *GoEdgeSet) {
 	vs := NewGoVertexSet()
@@ -255,7 +259,8 @@ func go_find_color_block(i int, j int) (*GoVertexSet, *GoEdgeSet) {
 }
 func go_find_color_block_iter(
 	vs *GoVertexSet, es *GoEdgeSet) (*GoVertexSet, *GoEdgeSet) {
-	// var es_ []*GoEdge
+	// fmt.Printf("vs:%d,es:%d\n",len(vs.m),len(es.m))
+	// fmt.Printf("es: %v\n",es.m)
 	new_coming_v := false
 	for v1v2, type_ := range es.m {
 		if type_ == CONNECT {
@@ -268,48 +273,13 @@ func go_find_color_block_iter(
 	}
 	new_coming_e := false
 	for v, _ := range vs.m {
-		if es.AddByVertex(v) { // 将v的所有邻居加入
+		if es.AddByVertex(v) { // 将v的所有邻边加入
 			new_coming_e = true
 		}
 	}
+	// fmt.Printf("new_coming_v=%v,new_coming_e=%v\n",new_coming_v,new_coming_e)
 	if !new_coming_v && !new_coming_e {
 		return vs, es
 	}
 	return go_find_color_block_iter(vs, es)
 }
-
-// func go_vertex_comb(a []*GoVertex, b []*GoVertex) (c []*GoVertex, new_coming bool) {
-// 	for _, v := range b {
-// 		if !go_in_xs(v, a) {
-// 			a = append(a, v)
-// 			new_coming = true
-// 		}
-// 	}
-// 	return a, new_coming
-// }
-// go_in_vertex_list
-// func go_in_xs(a *GoEqualAble, vs []*GoEqualAble) bool {
-// 	for _, x := range xs {
-// 		if a.Equal(x) {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
-// func go_in_xs(a *GoEqualAble, vs []*GoEqualAble) bool {
-// 	for _, x := range xs {
-// 		if a.Equal(x) {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
-// func go_edge_comb(a []*GoEdge, b []*GoEdge) (c []*GoEdge, new_coming bool) {
-// 	for _, v := range b {
-// 		if !go_in_xs(v, a) {
-// 			a = append(a, v)
-// 			new_coming = true
-// 		}
-// 	}
-// 	return a, new_coming
-// }

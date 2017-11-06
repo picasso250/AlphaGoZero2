@@ -38,6 +38,6 @@ func one_move_(i int, j int, color go_color) (err error) {
 	}
 	go_data[i][j] = color
 	go_vertex_data[i][j].color = color
-	go_update_edge(i,j)
+	go_update_edge(i, j)
 	return nil
 }

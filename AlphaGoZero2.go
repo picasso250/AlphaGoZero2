@@ -37,18 +37,27 @@ func main() {
 		log.Fatal(err)
 	}
 	print_go_board()
+	// fmt.Printf("edge of (9,9):\n")
+	// for k:=0;k<4;k++ {
+	// 	fmt.Printf("\t%s-%s(%d)\n",go_vertex_data[9][9].edge[k].v1,go_vertex_data[9][9].edge[k].v2,go_vertex_data[9][9].edge[k].type_)
+	// }
 
 	// fmt.Printf("qi of (9,9) is %d\n",go_get_qi(9,9))
-	s := NewGoEdgeSet()
-	_, exists := s.Get(&go_vertex_data[9][10], &go_vertex_data[9][9])
-	fmt.Printf("(9,10)-(9,9) exists? %v (should be no)\n", exists)
-	e:=GoEdge{&go_vertex_data[9][10], &go_vertex_data[9][9], CONNECT}
-	is_add := s.Add(&e)
-	fmt.Printf("add (9,10)-(9,9)? %v (should be yes)\n", is_add)
-	_, exists = s.Get(&go_vertex_data[9][10], &go_vertex_data[9][9])
-	fmt.Printf("(9,10)-(9,9) exists? %v (should be yes)\n", exists)
-	_, exists = s.Get(&go_vertex_data[9][9], &go_vertex_data[9][10])
-	fmt.Printf("(9,9)-(9,10) exists? %v (should be yes)\n", exists)
+	// s := NewGoEdgeSet()
+	// _, exists := s.Get(&go_vertex_data[9][10], &go_vertex_data[9][9])
+	// fmt.Printf("(9,10)-(9,9) exists? %v (should be no)\n", exists)
+	// e:=GoEdge{&go_vertex_data[9][10], &go_vertex_data[9][9], CONNECT}
+	// is_add := s.Add(&e)
+	// fmt.Printf("add (9,10)-(9,9)? %v (should be yes)\n", is_add)
+	// _, exists = s.Get(&go_vertex_data[9][10], &go_vertex_data[9][9])
+	// fmt.Printf("(9,10)-(9,9) exists? %v (should be yes)\n", exists)
+	// _, exists = s.Get(&go_vertex_data[9][9], &go_vertex_data[9][10])
+	// fmt.Printf("(9,9)-(9,10) exists? %v (should be yes)\n", exists)
+
+	vs, es := go_find_color_block(9, 9)
+	fmt.Printf("vs: %s\nes: %s\n", vs, es)
+	q := GoGetQi(9, 9)
+	fmt.Printf("(9,9) qi=%d\n", q)
 
 	fmt.Printf("OK\n")
 }

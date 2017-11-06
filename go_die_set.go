@@ -3,10 +3,10 @@
 package main
 
 import (
-// "fmt"
-// "strings"
-// "errors"
-// "log"
+	"fmt"
+	"strings"
+	// "errors"
+	// "log"
 )
 
 type GoEdgeSet struct {
@@ -16,6 +16,13 @@ type GoEdgeSet struct {
 func NewGoEdgeSet() (s *GoEdgeSet) {
 	m := make(map[[2]*GoVertex]int)
 	return &GoEdgeSet{m}
+}
+func (s *GoEdgeSet) String() string {
+	keys := make([]string, 0, len(s.m))
+	for k := range s.m {
+		keys = append(keys, fmt.Sprintf("%s-%s", k[0], k[1]))
+	}
+	return fmt.Sprintf("(%d)[%s]", len(keys), strings.Join(keys, ", "))
 }
 func (s *GoEdgeSet) Get(v1 *GoVertex, v2 *GoVertex) (int, bool) {
 	type_, ok := s.m[[2]*GoVertex{v1, v2}]
@@ -35,9 +42,12 @@ func (s *GoEdgeSet) Add(e *GoEdge) bool {
 func (s *GoEdgeSet) AddByVertex(v *GoVertex) bool {
 	is_add := false
 	for k := 0; k < 4; k++ {
-		is_add = is_add|| s.Add(&v.edge[k])
+		is_ := s.Add(&v.edge[k])
+		// fmt.Printf("add edge %s-%s (add?=%v)\n",v.edge[k].v1, v.edge[k].v2,is_)
+		is_add = is_add || is_
 	}
-	return !is_add // 是否添加了新元素
+	// fmt.Printf("AddByVertex is_add=%v\n",is_add)
+	return is_add // 是否添加了新元素
 }
 
 // 点的集合
@@ -48,6 +58,13 @@ type GoVertexSet struct {
 func NewGoVertexSet() (s *GoVertexSet) {
 	m := make(map[*GoVertex]bool)
 	return &GoVertexSet{m}
+}
+func (s *GoVertexSet) String() string {
+	keys := make([]string, 0, len(s.m))
+	for k := range s.m {
+		keys = append(keys, k.String())
+	}
+	return fmt.Sprintf("(%d)[%s]", len(keys), strings.Join(keys, ", "))
 }
 func (s *GoVertexSet) Get(v *GoVertex) (bool, bool) {
 	v_, ok := s.m[v]
