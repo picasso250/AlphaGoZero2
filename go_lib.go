@@ -10,22 +10,9 @@ import (
 
 // 棋盘大小
 const BOARD_SIZE = 19
-
+// 棋盘数据
 var go_vertex_data [BOARD_SIZE][BOARD_SIZE]GoVertex
 
-// 棋盘数据
-// 0 无棋子
-// 1 黑子
-// 2 白子
-// Golang will init all value to zero
-// https://golang.org/ref/spec#Variable_declarations
-type go_color byte
-
-const (
-	NONE  = 0
-	BLACK = 1
-	WHITE = 2
-)
 // 打印棋盘
 func print_go_board() {
 	for i := 0; i < BOARD_SIZE; i++ {
@@ -50,12 +37,15 @@ func assert(cond bool) {
 func IsForbidPoint(v GoVertex) bool {
 	assert(go_vertex_data[v.i][v.j].color==NONE)
 	// todo
+	// for k:=0;k<4;k++ {
+	// 	v.edge[k].v2
+	// }
 	return true
 }
 
 // 在某处位置走一步棋(计算机版本)
 // 有可能是在禁着点上，在人类版本上考虑此点
-func one_move_(i int, j int, color go_color) (err error) {
+func one_move_(i int, j int, color GoColor) (err error) {
 	assert(i >= 0 && i < BOARD_SIZE)
 	assert(j >= 0 && j < BOARD_SIZE)
 	if go_vertex_data[i][j].color != NONE {

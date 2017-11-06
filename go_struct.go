@@ -8,18 +8,34 @@ import (
 	// "log"
 )
 
+// 棋子颜色
+type GoColor byte
+// 0 无棋子
+// 1 黑子
+// 2 白子
+// Golang will init all value to zero
+// https://golang.org/ref/spec#Variable_declarations
+const (
+	NONE  = 0
+	BLACK = 1
+	WHITE = 2
+)
+func (c GoColor)Reverse() GoColor {
+	return BLACK+WHITE-c
+}
+
 // 顶点（代表棋子）
 // edge中不会有nil元素，即使它是壁，此时为闭类型
 type GoVertex struct {
 	i     int
 	j     int
-	color go_color
+	color GoColor
 	edge  [4]GoEdge // 默认为开
 }
 
 func (v *GoVertex) ColorStr() string {
-	var go_color_repr_map = [3]string{".", "x", "o"}
-	return go_color_repr_map[v.color]
+	var GoColor_repr_map = [3]string{".", "x", "o"}
+	return GoColor_repr_map[v.color]
 }
 func (v *GoVertex) ToStr() string {
 	return fmt.Sprintf("(%d,%d)", v.i, v.j)
