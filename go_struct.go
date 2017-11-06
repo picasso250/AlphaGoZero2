@@ -89,7 +89,7 @@ const (
 )
 
 func (e *GoEdge) String() string {
-	m:=[...]string{"开","连","挡"}
+	m := [...]string{"开", "连", "挡"}
 	return fmt.Sprintf("%s-%s\\(%s)", e.v1, e.v2, m[e.type_])
 }
 func (e *GoEdge) Reverse() GoEdge {

@@ -52,26 +52,24 @@ func GoOneMove(i int, j int, color GoColor) (err error) {
 		return err
 	}
 	// 是否死了，谁死了？
-	// v := &go_vertex_data[i][j]
-	// fmt.Printf("move %s\n", v)
-	// tizi := false
-	// for k := 0; k < 4; k++ {
-	// 	v_other := v.edge[k].v2
-	// 	// fmt.Printf("%s -> %s\n",v,v_other)
-	// 	if v_other.color == v.color.Reverse() {
-	// 		q := GoGetQi(v_other.i, v_other.j)
-	// 		fmt.Printf("%s -> %s =%d(气)\n", v, v_other, q)
-	// 		if q == 0 {
-	// 			GoTiZi(v_other)
-	// 			tizi = true
-	// 		}
-	// 	}
-	// }
-	// if !tizi {
-	// 	if GoGetQi(v.i, v.j) == 0 {
-	// 		return errors.New("禁着点")
-	// 	}
-	// }
+	v := &go_vertex_data[i][j]
+	tizi := false
+	for k := 0; k < 4; k++ {
+		v_other := v.edge[k].v2
+		if v_other.color == v.color.Reverse() {
+			q := GoGetQi(v_other.i, v_other.j)
+			// fmt.Printf("%s -> %s =%d(气)\n", v, v_other, q)
+			if q == 0 {
+				GoTiZi(v_other)
+				tizi = true
+			}
+		}
+	}
+	if !tizi {
+		if GoGetQi(v.i, v.j) == 0 {
+			return errors.New("禁着点")
+		}
+	}
 	return nil
 }
 

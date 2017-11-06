@@ -46,8 +46,8 @@ func main() {
 
 	// vs, es := go_find_color_block(9, 9)
 	// fmt.Printf("vs: %s\nes: %s\n", vs, es)
-	q := GoGetQi(9, 9)
-	fmt.Printf("%s qi=%d\n",&go_vertex_data[9][9], q)
+	// q := GoGetQi(9, 9)
+	// fmt.Printf("%s qi=%d\n",&go_vertex_data[9][9], q)
 
 	fmt.Printf("OK\n")
 }
