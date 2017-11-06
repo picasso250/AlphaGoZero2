@@ -19,8 +19,8 @@ func NewGoEdgeSet() (s *GoEdgeSet) {
 }
 func (s *GoEdgeSet) String() string {
 	keys := make([]string, 0, len(s.m))
-	for k := range s.m {
-		keys = append(keys, fmt.Sprintf("%s-%s", k[0], k[1]))
+	for k, t := range s.m {
+		keys = append(keys, fmt.Sprintf("%s-%s|%d", k[0], k[1], t))
 	}
 	return fmt.Sprintf("(%d)[%s]", len(keys), strings.Join(keys, ", "))
 }

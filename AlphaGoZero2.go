@@ -11,17 +11,25 @@ func main() {
 
 	var err error
 	go_vetex_data_init()
-	if err = one_move_(9, 10, WHITE); err != nil {
+	if err = GoOneMove(9, 9, BLACK); err != nil {
 		log.Fatal(err)
 	}
-	if err = one_move_(9, 9, WHITE); err != nil {
+	if err = GoOneMove(8, 9, WHITE); err != nil {
 		log.Fatal(err)
 	}
-	un_move_(9, 10)
+	if err = GoOneMove(10, 9, WHITE); err != nil {
+		log.Fatal(err)
+	}
+	if err = GoOneMove(9, 8, WHITE); err != nil {
+		log.Fatal(err)
+	}
+	if err = GoOneMove(9, 10, WHITE); err != nil {
+		log.Fatal(err)
+	}
 	print_go_board()
 	// fmt.Printf("edge of (9,9):\n")
-	// for k:=0;k<4;k++ {
-	// 	fmt.Printf("\t%s-%s(%d)\n",go_vertex_data[9][9].edge[k].v1,go_vertex_data[9][9].edge[k].v2,go_vertex_data[9][9].edge[k].type_)
+	// for k := 0; k < 4; k++ {
+	// 	fmt.Printf("\t%s\n", &go_vertex_data[9][9].edge[k])
 	// }
 
 	// fmt.Printf("qi of (9,9) is %d\n",go_get_qi(9,9))
@@ -36,10 +44,10 @@ func main() {
 	// _, exists = s.Get(&go_vertex_data[9][9], &go_vertex_data[9][10])
 	// fmt.Printf("(9,9)-(9,10) exists? %v (should be yes)\n", exists)
 
-	vs, es := go_find_color_block(9, 9)
-	fmt.Printf("vs: %s\nes: %s\n", vs, es)
+	// vs, es := go_find_color_block(9, 9)
+	// fmt.Printf("vs: %s\nes: %s\n", vs, es)
 	q := GoGetQi(9, 9)
-	fmt.Printf("(9,9) qi=%d\n", q)
+	fmt.Printf("%s qi=%d\n",&go_vertex_data[9][9], q)
 
 	fmt.Printf("OK\n")
 }

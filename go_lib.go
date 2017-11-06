@@ -11,6 +11,7 @@ import (
 
 // 棋盘大小
 const BOARD_SIZE = 19
+
 // 棋盘数据
 var go_vertex_data [BOARD_SIZE][BOARD_SIZE]GoVertex
 
@@ -37,12 +38,53 @@ func assert(cond bool) {
 
 // 是否是禁着点
 func IsForbidPoint(v GoVertex) bool {
-	assert(go_vertex_data[v.i][v.j].color==NONE)
+	assert(go_vertex_data[v.i][v.j].color == NONE)
 	// todo
 	// for k:=0;k<4;k++ {
 	// 	v.edge[k].v2
 	// }
 	return true
+}
+
+func GoOneMove(i int, j int, color GoColor) (err error) {
+	err = one_move_(i, j, color)
+	if err != nil {
+		return err
+	}
+	// 是否死了，谁死了？
+	// v := &go_vertex_data[i][j]
+	// fmt.Printf("move %s\n", v)
+	// tizi := false
+	// for k := 0; k < 4; k++ {
+	// 	v_other := v.edge[k].v2
+	// 	// fmt.Printf("%s -> %s\n",v,v_other)
+	// 	if v_other.color == v.color.Reverse() {
+	// 		q := GoGetQi(v_other.i, v_other.j)
+	// 		fmt.Printf("%s -> %s =%d(气)\n", v, v_other, q)
+	// 		if q == 0 {
+	// 			GoTiZi(v_other)
+	// 			tizi = true
+	// 		}
+	// 	}
+	// }
+	// if !tizi {
+	// 	if GoGetQi(v.i, v.j) == 0 {
+	// 		return errors.New("禁着点")
+	// 	}
+	// }
+	return nil
+}
+
+// 提子
+func GoTiZi(v *GoVertex) {
+	fmt.Printf("ti %s\n", v)
+	vs, _ := go_find_color_block(v.i, v.j)
+	for v, _ := range vs.m {
+		v.color = NONE
+	}
+	for v, _ := range vs.m {
+		go_update_edge(v.i, v.j)
+	}
 }
 
 // 在某处位置走一步棋(计算机版本)
@@ -55,10 +97,10 @@ func one_move_(i int, j int, color GoColor) (err error) {
 	}
 	go_vertex_data[i][j].color = color
 	go_update_edge(i, j)
-	// 是否死了，谁死了？
-	// 如何提子？
+
 	return nil
 }
+
 // 悔棋(计算机版本)
 func un_move_(i int, j int) {
 	assert(i >= 0 && i < BOARD_SIZE)

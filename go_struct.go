@@ -10,6 +10,7 @@ import (
 
 // 棋子颜色
 type GoColor byte
+
 // 0 无棋子
 // 1 黑子
 // 2 白子
@@ -20,8 +21,9 @@ const (
 	BLACK = 1
 	WHITE = 2
 )
-func (c GoColor)Reverse() GoColor {
-	return BLACK+WHITE-c
+
+func (c GoColor) Reverse() GoColor {
+	return BLACK + WHITE - c
 }
 
 // 顶点（代表棋子）
@@ -41,7 +43,7 @@ func (v *GoVertex) ToStr() string {
 	return fmt.Sprintf("(%d,%d)", v.i, v.j)
 }
 func (v *GoVertex) String() string {
-	return fmt.Sprintf("(%d,%d)", v.i, v.j)
+	return fmt.Sprintf("|%s(%d,%d)", v.ColorStr(), v.i, v.j)
 }
 func (v *GoVertex) Equal(w *GoVertex) bool {
 	return v.i == w.i && v.j == w.j
@@ -87,7 +89,8 @@ const (
 )
 
 func (e *GoEdge) String() string {
-	return fmt.Sprintf("%s-%s(%d)", e.v1, e.v2, e.type_)
+	m:=[...]string{"开","连","挡"}
+	return fmt.Sprintf("%s-%s\\(%s)", e.v1, e.v2, m[e.type_])
 }
 func (e *GoEdge) Reverse() GoEdge {
 	return GoEdge{e.v2, e.v1, e.type_}
@@ -122,17 +125,21 @@ func (e *GoEdge) IsSecondV(i int, j int) bool {
 func (e *GoEdge) UpdateByV() {
 	if e.v2 == nil {
 		e.type_ = BLOCK
-	} else if e.v1.color == e.v2.color {
-		// fmt.Printf("_updateEdge %s.color=%d, %s.color=%d CONNECT\n",e.v1,e.v1.color,e.v2,e.v2.color)
+	} else {
 		// 当悔棋的时候，色可能为空
 		if e.v1.color == NONE {
 			e.type_ = OPEN
 		} else {
-			e.type_ = CONNECT
+			if e.v2.color == NONE {
+				e.type_ = OPEN
+			} else {
+				if e.v1.color == e.v2.color {
+					e.type_ = CONNECT
+				} else {
+					e.type_ = BLOCK
+				}
+			}
 		}
-	} else {
-		// fmt.Printf("_updateEdge %s.color=%d, %s.color=%d OPEN\n",e.v1,e.v1.color,e.v2,e.v2.color)
-		e.type_ = OPEN
 	}
 }
 func (e *GoEdge) IsSameColor() bool {
