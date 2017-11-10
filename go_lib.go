@@ -6,14 +6,20 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"runtime/debug"
 )
 
 // 棋盘大小
-const BOARD_SIZE = 2
+const BOARD_SIZE = 9
 
 // 棋盘数据
 var go_vertex_data [BOARD_SIZE][BOARD_SIZE]GoVertex
+
+var (
+	ErrForbidPoint = errors.New("禁着点")
+	ErrViewSame    = errors.New("禁止全局同型")
+)
 
 // 打印棋盘
 func print_go_board() {
@@ -36,7 +42,7 @@ func assert(cond bool) {
 	}
 }
 
-// 是否是禁着点
+// 下一步棋，同时查看是否是禁着点
 func GoOneMove(i int, j int, color GoColor) (err error) {
 	err = one_move_(i, j, color)
 	if err != nil {
@@ -47,19 +53,20 @@ func GoOneMove(i int, j int, color GoColor) (err error) {
 	tizi := false
 	for k := 0; k < 4; k++ {
 		v_other := v.edge[k].v2
-		if v_other!=nil && v_other.color == v.color.Reverse() {
+		if v_other != nil && v_other.color == v.color.Reverse() {
 			q := GoGetQi(v_other.i, v_other.j)
-			// fmt.Printf("%s -> %s =%d(气)\n", v, v_other, q)
 			if q == 0 {
 				GoTiZi(v_other)
 				tizi = true
 			}
 		}
 	}
-	if !tizi {
-		if GoGetQi(v.i, v.j) == 0 {
-			return errors.New("禁着点")
-		}
+	// 禁着点
+	if !tizi && GoGetQi(v.i, v.j) == 0 {
+		return ErrForbidPoint
+	}
+	if GoAppendSeq(i, j, color) {
+		return ErrViewSame
 	}
 	return nil
 }
@@ -82,11 +89,10 @@ func one_move_(i int, j int, color GoColor) (err error) {
 	assert(i >= 0 && i < BOARD_SIZE)
 	assert(j >= 0 && j < BOARD_SIZE)
 	if go_vertex_data[i][j].color != NONE {
-		return errors.New("can not move on an already point")
+		return errors.New("can not move on an already point "+strconv.Itoa(i)+","+strconv.Itoa(j))
 	}
 	go_vertex_data[i][j].color = color
 	go_update_edge(i, j)
-
 	return nil
 }
 
@@ -98,17 +104,18 @@ func un_move_(i int, j int) {
 	go_vertex_data[i][j].color = NONE
 	go_update_edge(i, j)
 }
+
 // 盘面胜负
-func GoGetPanMian() (map[GoColor]int) {
-	m:=make(map[GoColor]int)
+func GoGetPanMian() map[GoColor]int {
+	m := make(map[GoColor]int)
 	for i := 0; i < BOARD_SIZE; i++ {
 		for j := 0; j < BOARD_SIZE; j++ {
-			v:=go_vertex_data[i][j]
-			if v.color!=NONE {
+			v := go_vertex_data[i][j]
+			if v.color != NONE {
 				m[v.color]++
 			} else {
-				c:=v.GetOwnerColor()
-				if c!=NONE {
+				c := v.GetOwnerColor()
+				if c != NONE {
 					m[c]++
 				}
 			}
@@ -117,6 +124,11 @@ func GoGetPanMian() (map[GoColor]int) {
 	return m
 }
 func GoPrintPanMian() {
-	m:=GoGetPanMian()
-	fmt.Printf("黑：%d 白: %d\n", m[BLACK],m[WHITE])
+	m := GoGetPanMian()
+	fmt.Printf("黑：%d 白: %d\n", m[BLACK], m[WHITE])
 }
+
+// func GoIsFinish()  {
+// 	// 只有一种可能性：黑白双方连续虚着
+// 	return GoSeq2XuZhao()
+// }

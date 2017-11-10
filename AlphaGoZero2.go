@@ -15,24 +15,51 @@ func main() {
 
 	var err error
 	go_vetex_data_init()
-	if err = GoOneMove(0, 0, BLACK); err != nil {
+	// if err = one_move_(1, 1, WHITE); err != nil {
+	// 	log.Fatal(err)
+	// }
+	if err = one_move_(1, 3, WHITE); err != nil {
 		log.Fatal(err)
 	}
-	print_go_board()
-	GoPrintPanMian()
+	if err = one_move_(0, 2, WHITE); err != nil {
+		log.Fatal(err)
+	}
+	if err = one_move_(2, 2, WHITE); err != nil {
+		log.Fatal(err)
+	}
+	if err = one_move_(0, 3, BLACK); err != nil {
+		log.Fatal(err)
+	}
+	if err = one_move_(2, 3, BLACK); err != nil {
+		log.Fatal(err)
+	}
+	if err = one_move_(1, 4, BLACK); err != nil {
+		log.Fatal(err)
+	}
+
 	if err = GoOneMove(1, 1, WHITE); err != nil {
 		log.Fatal(err)
 	}
-	// if err = GoOneMove(6, 5, WHITE); err != nil {
+	print_go_board()
+	if err = GoOneMove(1, 2, BLACK); err != nil {
+		log.Fatal(err)
+	}
+	print_go_board()
+	if err = GoOneMove(1, 3, WHITE); err != nil {
+		log.Fatal(err)
+	}
+	print_go_board()
+	// GoPrintPanMian()
+	// if err = GoOneMove(1, 1, BLACK); err != nil {
 	// 	log.Fatal(err)
 	// }
+
 	// if err = GoOneMove(5, 4, WHITE); err != nil {
 	// 	log.Fatal(err)
 	// }
 	// if err = GoOneMove(5, 6, WHITE); err != nil {
 	// 	log.Fatal(err)
 	// }
-	print_go_board()
 	// fmt.Printf("edge of (5,9):\n")
 	// for k := 0; k < 4; k++ {
 	// 	fmt.Printf("\t%s\n", &go_vertex_data[9][9].edge[k])
@@ -42,7 +69,7 @@ func main() {
 	// fmt.Printf("vs: %s\nes: %s\n", vs, es)
 	// q := GoGetQi(9, 9)
 
-	GoPrintPanMian()
+	// GoPrintPanMian()
 	return
 
 	for {
@@ -60,11 +87,13 @@ func main() {
 
 		switch {
 		case true:
-			err=GoHumanInteractPlay()
-			if err!=nil {
+			err = GoHumanInteractPlay()
+			if err != nil {
 				log.Fatal(err)
 			}
 			print_go_board()
+			GoPrintPanMian()
+			GoAI_PlayOneStep(go_play_seq[len(go_play_seq)-1].v.color)
 		}
 	}
 	fmt.Printf("OK\n")
@@ -80,7 +109,7 @@ func GoHumanInteractPlay() error {
 	if n == 0 {
 		return errors.New("empty cmd, reEnter\n")
 	}
-	fmt.Printf("move at %s %d ,color = %s\n",j_s,i_d,color_s)
+	fmt.Printf("move at %s %d ,color = %s\n", j_s, i_d, color_s)
 	i := BOARD_SIZE - i_d
 	j := int(strings.ToUpper(j_s)[0] - 'A')
 	if !go_pos_in_board(i, j) {

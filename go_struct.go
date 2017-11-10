@@ -32,7 +32,7 @@ type GoVertex struct {
 	i     int
 	j     int
 	color GoColor
-	edge  [4]GoEdge // 默认为开
+	edge  [4]GoEdge // 相连的4条边 默认类型为开
 }
 
 func (v *GoVertex) ColorStr() string {
@@ -43,24 +43,25 @@ func GoColorMap() [3]string {
 	return [3]string{".", "x", "o"}
 }
 func GoColorMapRev() map[string]GoColor {
-	m:=make(map[string]GoColor, 3)
-	for k,v:=range GoColorMap() {
-		m[v]= GoColor(k)
+	m := make(map[string]GoColor, 3)
+	for k, v := range GoColorMap() {
+		m[v] = GoColor(k)
 	}
 	return m
 }
+
 // 对空点，找出其所属的势力（颜色）
 func (v *GoVertex) GetOwnerColor() (color GoColor) {
-	assert(v.color==NONE)
-	m:=make(map[GoColor]bool)
-	for k:=0;k<4;k++ {
-		neibour:=v.edge[k].v2
-		if neibour!=nil {
-			m[neibour.color]=true
-			color=neibour.color
+	assert(v.color == NONE)
+	m := make(map[GoColor]bool)
+	for k := 0; k < 4; k++ {
+		neibour := v.edge[k].v2
+		if neibour != nil {
+			m[neibour.color] = true
+			color = neibour.color
 		}
 	}
-	if len(m)==1 {
+	if len(m) == 1 {
 		return color
 	}
 	return NONE
@@ -109,9 +110,9 @@ type GoEdge struct {
 
 // 边的类型
 const (
-	OPEN    = 0
-	CONNECT = 1
-	BLOCK   = 2
+	OPEN    = 0 // 开，至少一个点为空
+	CONNECT = 1 // 连，同色相连
+	BLOCK   = 2 // 闭，异色相连 或者 碰壁
 )
 
 func (e *GoEdge) String() string {

@@ -105,6 +105,8 @@ func go_get_edge_index_by(v_subject *GoVertex, v_object *GoVertex) int {
 // 气=qi(M)=count{V|V所属的E是开类型}
 func GoGetQi(i int, j int) int {
 	assert(go_vertex_data[i][j].color != NONE)
+	// 找出棋块
+	// 找出将棋块相邻的点，其中没有子的点的数量就是气
 	_, es := go_find_color_block(i, j)
 	return go_count_open(es)
 }
@@ -132,8 +134,6 @@ func go_find_color_block(i int, j int) (*GoVertexSet, *GoEdgeSet) {
 }
 func go_find_color_block_iter(
 	vs *GoVertexSet, es *GoEdgeSet) (*GoVertexSet, *GoEdgeSet) {
-	// fmt.Printf("vs:%d,es:%d\n",len(vs.m),len(es.m))
-	// fmt.Printf("es: %v\n",es.m)
 	new_coming_v := false
 	for v1v2, type_ := range es.m {
 		if type_ == CONNECT {
@@ -150,7 +150,6 @@ func go_find_color_block_iter(
 			new_coming_e = true
 		}
 	}
-	// fmt.Printf("new_coming_v=%v,new_coming_e=%v\n",new_coming_v,new_coming_e)
 	if !new_coming_v && !new_coming_e {
 		return vs, es
 	}
