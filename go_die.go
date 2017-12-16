@@ -2,7 +2,7 @@ package main
 
 // 死活
 import (
-// "fmt"
+"fmt"
 // "strings"
 // "errors"
 // "log"
@@ -104,12 +104,25 @@ func go_get_edge_index_by(v_subject *GoVertex, v_object *GoVertex) int {
 
 // 气=qi(M)=count{V|V所属的E是开类型}
 func GoGetQi(i int, j int) int {
-	assert(go_vertex_data[i][j].color != NONE)
-	// 找出棋块
-	// 找出将棋块相邻的点，其中没有子的点的数量就是气
-	_, es := go_find_color_block(i, j)
-	return go_count_open(es)
+	// assert(go_vertex_data[i][j].color != NONE)
+	// // 找出棋块
+	// // 找出将棋块相邻的点，其中没有子的点的数量就是气
+	// _, es := go_find_color_block(i, j)
+	// return go_count_open(es)
+
+	block := go_vertex_data[i][j].block
+	s:=NewGoVertexSet()
+	for _,v := range block.data {
+		_vs := get_neibour_by_color(v,NONE)
+		fmt.Printf("get_neibour_by_color %v %v\n",v, _vs)
+		for _,_v := range _vs {
+			s.Add(_v)
+		}
+	}
+	fmt.Printf("%v\n", s)
+	return s.Len()
 }
+
 func go_count_open(es *GoEdgeSet) int {
 	vs := NewGoVertexSet()
 	for v1v2, type_ := range es.m {

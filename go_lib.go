@@ -67,6 +67,8 @@ func one_move_(i int, j int, color GoColor) (err error) {
 	}
 	go_vertex_data[i][j].color = color
 	go_update_edge(i, j)
+
+	go_vertex_data[i][j].block = GetGoBlock(i, j)
 	return nil
 }
 
@@ -109,8 +111,12 @@ func do_tizi_4(i int, j int) bool {
 	return tizi
 }
 
-func undo_one_step()  {
-	shot := go_play_seq[len(go_play_seq)-2].shot
+func undo_one_step() error {
+	i := len(go_play_seq)-2
+	if i < 0 {
+		return errors.New("undo start")
+	}
+	shot := go_play_seq[i].shot
 	for i := 0; i < BOARD_SIZE; i++ {
 		for j := 0; j < BOARD_SIZE; j++ {
 			go_vertex_data[i][j].color = shot[i][j]
@@ -121,4 +127,50 @@ func undo_one_step()  {
 			go_vertex_data[i][j].InitEdge()
 		}
 	}
+	return nil
+}
+
+// 悔棋(计算机版本)
+// 仅仅用于没有提子的情况
+func un_move_(i int, j int) {
+	assert(i >= 0 && i < BOARD_SIZE)
+	assert(j >= 0 && j < BOARD_SIZE)
+	assert(go_vertex_data[i][j].color != NONE)
+	go_vertex_data[i][j].color = NONE
+	go_update_edge(i, j)
+}
+
+type GoPos struct {
+	i int
+	j int
+}
+func (p GoPos) InBoard() bool {
+	return 0<=p.i && p.i < BOARD_SIZE && 0<=p.j&&p.j<BOARD_SIZE
+}
+func get_neibour_pos_list(i int, j int) (ret []GoPos) {
+	neibour_pos_list := [4]GoPos{
+		GoPos{i-1, j},
+		GoPos{i, j-1},
+		GoPos{i, j+1},
+		GoPos{i+1, j},
+	}
+	ret = make([]GoPos, 0, 4)
+	for ii := 0; ii < 4; ii++ {
+    pos := neibour_pos_list[ii]
+		if pos.InBoard() {
+			ret = append(ret, pos)
+		}
+  }
+	return ret
+}
+
+func get_neibour_by_color(v *GoVertex, color GoColor) (ret []*GoVertex) {
+	pos_list := get_neibour_pos_list(v.i,v.j)
+	for _,pos := range pos_list {
+		p := &go_vertex_data[pos.i][pos.j]
+		if p.color == color {
+			ret = append(ret, p)
+		}
+	}
+	return ret
 }

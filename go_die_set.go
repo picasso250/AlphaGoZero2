@@ -49,6 +49,9 @@ func (s *GoEdgeSet) AddByVertex(v *GoVertex) bool {
 	// fmt.Printf("AddByVertex is_add=%v\n",is_add)
 	return is_add // 是否添加了新元素
 }
+func (s *GoEdgeSet) Len() int {
+	return len(s.m)
+}
 
 // 点的集合
 type GoVertexSet struct {
@@ -98,4 +101,7 @@ func (s *GoVertexSet) AddEdgeByTwoVertex(vs [2]*GoVertex) bool {
 		is_add2 = s.Add(vs[1])
 	}
 	return is_add1 || is_add2 // 是否添加了新元素
+}
+func (s *GoVertexSet) Len() int {
+	return len(s.m)
 }
