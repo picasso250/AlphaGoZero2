@@ -1,0 +1,19 @@
+{{define "board"}}
+<canvas id="{{.Id}}" width="{{.Width}}" height="{{.Height}}"></canvas>
+<script type="text/javascript">
+  BOARD_SIZE = {{.Size}};
+  var id = "{{.Id}}";
+  var c = document.getElementById(id);
+  var ctx = c.getContext("2d");
+  ctx.translate(grid_size, grid_size);
+  ctx.strokeStyle = '#666666';
+  for (var i = 0; i < BOARD_SIZE-1; i++) {
+    for (var j = 0; j < BOARD_SIZE-1; j++) {
+      ctx.strokeRect(i*grid_size,j*grid_size,grid_size,grid_size);
+    }
+  }
+  {{range .DrawCode}}
+    {{.}}
+  {{end}}
+</script>
+{{end}}

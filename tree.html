@@ -1,0 +1,38 @@
+{{define "tree"}}
+<script type="text/javascript" src="js/board.js"></script>
+
+<style media="screen">
+  .tree {
+    border: 1px solid;
+  }
+  .tree-grid {
+    border: 1px solid;
+    padding: 8px;
+  }
+  canvas {
+    display: block;
+    margin: auto;
+  }
+</style>
+
+<table class="tree">
+  <tbody>
+    <tr>
+      <td class="tree-grid" colspan="3">
+        {{template "board" .start}}
+      </td>
+    </tr>
+    <tr>
+      <td class="tree-grid">
+        {{template "board" .a1}}
+      </td>
+      <td class="tree-grid">
+        {{template "board" .a2}}
+      </td>
+      <td class="tree-grid">
+        {{template "board" .a3}}
+      </td>
+    </tr>
+  </tbody>
+</table>
+{{end}}
