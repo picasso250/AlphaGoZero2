@@ -1,6 +1,7 @@
 package main
 
-// 数据结构
+// 防止无限循环
+
 import (
 // "fmt"
 // "strings"
@@ -12,12 +13,12 @@ type GoPlaySeqNode struct {
 	is_xuzhao bool
 	v         GoVertex
 	count     int         // 棋盘上棋子的数量
-	shot      GoBoardShot // 下子之后的局面
+	shot      GoBoardShot // 下子之后的局面(快照)
 }
 type GoBoardShot [BOARD_SIZE][BOARD_SIZE]GoColor
 type GoPlaySeq []GoPlaySeqNode
 
-var go_play_seq GoPlaySeq
+var go_play_seq GoPlaySeq // 全局变量，这盘棋的走子顺序
 
 func GoSeq2XuZhao() bool {
 	n := len(go_play_seq)

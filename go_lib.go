@@ -6,12 +6,15 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"strconv"
 	"runtime/debug"
+	"strconv"
 )
 
 // 棋盘大小
-const BOARD_SIZE = 9
+const BOARD_SIZE = 3
+
+// 贴目
+const tiemu = 0
 
 // 棋盘数据
 var go_vertex_data [BOARD_SIZE][BOARD_SIZE]GoVertex
@@ -60,7 +63,7 @@ func one_move_(i int, j int, color GoColor) (err error) {
 	assert(i >= 0 && i < BOARD_SIZE)
 	assert(j >= 0 && j < BOARD_SIZE)
 	if go_vertex_data[i][j].color != NONE {
-		return errors.New("can not move on an already point "+strconv.Itoa(i)+","+strconv.Itoa(j))
+		return errors.New("can not move on an already point " + strconv.Itoa(i) + "," + strconv.Itoa(j))
 	}
 	go_vertex_data[i][j].color = color
 	go_update_edge(i, j)
@@ -90,7 +93,32 @@ func GoPrintPanMian() {
 	fmt.Printf("黑：%d 白: %d\n", m[BLACK], m[WHITE])
 }
 
-// func GoIsFinish()  {
-// 	// 只有一种可能性：黑白双方连续虚着
-// 	return GoSeq2XuZhao()
-// }
+func do_tizi_4(i int, j int) bool {
+	v := &go_vertex_data[i][j]
+	tizi := false
+	for k := 0; k < 4; k++ {
+		v_other := v.edge[k].v2
+		if v_other != nil && v_other.color == v.color.Reverse() {
+			qi := GoGetQi(v_other.i, v_other.j)
+			if qi == 0 {
+				GoTiZi(v_other)
+				tizi = true
+			}
+		}
+	}
+	return tizi
+}
+
+func undo_one_step()  {
+	shot := go_play_seq[len(go_play_seq)-2].shot
+	for i := 0; i < BOARD_SIZE; i++ {
+		for j := 0; j < BOARD_SIZE; j++ {
+			go_vertex_data[i][j].color = shot[i][j]
+		}
+	}
+	for i := 0; i < BOARD_SIZE; i++ {
+		for j := 0; j < BOARD_SIZE; j++ {
+			go_vertex_data[i][j].InitEdge()
+		}
+	}
+}
