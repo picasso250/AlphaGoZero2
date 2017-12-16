@@ -50,7 +50,7 @@ func (n *GoPlaySeqNode) Equal(n2 *GoPlaySeqNode) bool {
 	}
 	return true
 }
-func GoGetBoardShot() (s [BOARD_SIZE][BOARD_SIZE]GoColor, count int) {
+func GoGetBoardShot() (s GoBoardShot, count int) {
 	for i := 0; i < BOARD_SIZE; i++ {
 		for j := 0; j < BOARD_SIZE; j++ {
 			color := go_vertex_data[i][j].color

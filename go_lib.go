@@ -42,35 +42,6 @@ func assert(cond bool) {
 	}
 }
 
-// 下一步棋，同时查看是否是禁着点
-func GoOneMove(i int, j int, color GoColor) (err error) {
-	err = one_move_(i, j, color)
-	if err != nil {
-		return err
-	}
-	// 是否死了，谁死了？
-	v := &go_vertex_data[i][j]
-	tizi := false
-	for k := 0; k < 4; k++ {
-		v_other := v.edge[k].v2
-		if v_other != nil && v_other.color == v.color.Reverse() {
-			q := GoGetQi(v_other.i, v_other.j)
-			if q == 0 {
-				GoTiZi(v_other)
-				tizi = true
-			}
-		}
-	}
-	// 禁着点
-	if !tizi && GoGetQi(v.i, v.j) == 0 {
-		return ErrForbidPoint
-	}
-	if GoAppendSeq(i, j, color) {
-		return ErrViewSame
-	}
-	return nil
-}
-
 // 提子
 func GoTiZi(v *GoVertex) {
 	fmt.Printf("ti %s\n", v)
@@ -94,15 +65,6 @@ func one_move_(i int, j int, color GoColor) (err error) {
 	go_vertex_data[i][j].color = color
 	go_update_edge(i, j)
 	return nil
-}
-
-// 悔棋(计算机版本)
-func un_move_(i int, j int) {
-	assert(i >= 0 && i < BOARD_SIZE)
-	assert(j >= 0 && j < BOARD_SIZE)
-	assert(go_vertex_data[i][j].color != NONE)
-	go_vertex_data[i][j].color = NONE
-	go_update_edge(i, j)
 }
 
 // 盘面胜负
