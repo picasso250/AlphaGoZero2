@@ -18,7 +18,7 @@ func GoOneMove(i int, j int, color GoColor) (err error) {
 	}
 	// 对周围四个子，是否死了，谁死了？
 	tizi := do_tizi_4(i, j)
-	fmt.Printf("tizi=%v, qi=%d\n",tizi,GoGetQi(i, j))
+	fmt.Printf("tizi=%v, qi=%d\n", tizi, GoGetQi(i, j))
 	// 禁着点
 	if !tizi && GoGetQi(i, j) == 0 {
 		return ErrForbidPoint

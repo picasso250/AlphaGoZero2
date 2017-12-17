@@ -112,7 +112,7 @@ func do_tizi_4(i int, j int) bool {
 }
 
 func undo_one_step() error {
-	i := len(go_play_seq)-2
+	i := len(go_play_seq) - 2
 	if i < 0 {
 		return errors.New("undo start")
 	}
@@ -144,33 +144,37 @@ type GoPos struct {
 	i int
 	j int
 }
+
 func (p GoPos) InBoard() bool {
-	return 0<=p.i && p.i < BOARD_SIZE && 0<=p.j&&p.j<BOARD_SIZE
+	return 0 <= p.i && p.i < BOARD_SIZE && 0 <= p.j && p.j < BOARD_SIZE
 }
 func get_neibour_pos_list(i int, j int) (ret []GoPos) {
 	neibour_pos_list := [4]GoPos{
-		GoPos{i-1, j},
-		GoPos{i, j-1},
-		GoPos{i, j+1},
-		GoPos{i+1, j},
+		GoPos{i - 1, j},
+		GoPos{i, j - 1},
+		GoPos{i, j + 1},
+		GoPos{i + 1, j},
 	}
 	ret = make([]GoPos, 0, 4)
 	for ii := 0; ii < 4; ii++ {
-    pos := neibour_pos_list[ii]
+		pos := neibour_pos_list[ii]
 		if pos.InBoard() {
 			ret = append(ret, pos)
 		}
-  }
+	}
 	return ret
 }
 
 func get_neibour_by_color(v *GoVertex, color GoColor) (ret []*GoVertex) {
-	pos_list := get_neibour_pos_list(v.i,v.j)
-	for _,pos := range pos_list {
+	pos_list := get_neibour_pos_list(v.i, v.j)
+	for _, pos := range pos_list {
 		p := &go_vertex_data[pos.i][pos.j]
 		if p.color == color {
 			ret = append(ret, p)
 		}
 	}
 	return ret
+}
+func D(format string, v ...interface{}) {
+	fmt.Printf(format, v...)
 }

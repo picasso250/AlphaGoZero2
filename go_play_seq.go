@@ -3,7 +3,7 @@ package main
 // 防止无限循环
 
 import (
-"fmt"
+// "fmt"
 // "strings"
 // "errors"
 // "log"
@@ -30,13 +30,11 @@ func GoAppendSeq(i int, j int, color GoColor) bool {
 	v := GoVertex{i: i, j: j, color: color}
 	shot, count := GoGetBoardShot()
 	seq_node := GoPlaySeqNode{false, v, count, shot}
-	fmt.Printf("GoAppendSeq==\n")
 	for k := len(go_play_seq) - 2; k >= 0; k -= 2 {
 		if seq_node.Equal(&go_play_seq[k]) {
 			return true
 		}
 	}
-	fmt.Printf("append\n")
 	go_play_seq = append(go_play_seq, seq_node)
 	return false
 }

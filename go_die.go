@@ -2,7 +2,7 @@ package main
 
 // 死活
 import (
-"fmt"
+// "fmt"
 // "strings"
 // "errors"
 // "log"
@@ -111,15 +111,13 @@ func GoGetQi(i int, j int) int {
 	// return go_count_open(es)
 
 	block := go_vertex_data[i][j].block
-	s:=NewGoVertexSet()
-	for _,v := range block.data {
-		_vs := get_neibour_by_color(v,NONE)
-		fmt.Printf("get_neibour_by_color %v %v\n",v, _vs)
-		for _,_v := range _vs {
+	s := NewGoVertexSet()
+	for _, v := range block.data {
+		_vs := get_neibour_by_color(v, NONE)
+		for _, _v := range _vs {
 			s.Add(_v)
 		}
 	}
-	fmt.Printf("%v\n", s)
 	return s.Len()
 }
 
